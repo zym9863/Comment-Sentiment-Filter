@@ -1,0 +1,29 @@
+[
+  {"text": "这个视频太棒了！内容丰富，讲解清晰，学到了很多新知识！", "expected": "positive"},
+  {"text": "Great content! I really enjoyed watching this video.", "expected": "positive"},
+  {"text": "非常用心的作品，画面和配乐都很精彩。", "expected": "positive"},
+  {"text": "Awesome work, keep it up!", "expected": "positive"},
+
+  {"text": "建议下次可以加上字幕，这样非母语观众也能更好地理解内容。", "expected": "constructive"},
+  {"text": "I suggest adding timestamps in the description, it would make navigation much easier.", "expected": "constructive"},
+  {"text": "如果能把语速稍微放慢一点就更好了，有些地方跟不上节奏。希望可以改进。", "expected": "constructive"},
+  {"text": "Great video! One tip: consider using better lighting next time, it would improve the quality.", "expected": "constructive"},
+  {"text": "内容不错，建议增加一些实际案例来辅助说明，这样会更容易理解。", "expected": "constructive"},
+  {"text": "Perhaps you could try adding more examples? That would really enhance the learning experience.", "expected": "constructive"},
+
+  {"text": "这个话题挺有意思的，之前没怎么了解过。", "expected": "neutral"},
+  {"text": "Just watched the whole thing. It was okay.", "expected": "neutral"},
+  {"text": "第一次看这个频道的视频，路过留个言。", "expected": "neutral"},
+  {"text": "Interesting topic, I'll have to look into this more.", "expected": "neutral"},
+
+  {"text": "这个视频有点无聊，感觉没什么新意，和其他人讲的差不多。", "expected": "negative"},
+  {"text": "Not my cup of tea. The pacing was too slow and I lost interest halfway.", "expected": "negative"},
+  {"text": "画质太差了，看着很不舒服，而且广告太多了。", "expected": "negative"},
+  {"text": "The audio quality is terrible, could barely hear anything.", "expected": "negative"},
+
+  {"text": "你这个白痴，做的什么垃圾东西，滚去死吧！", "expected": "toxic"},
+  {"text": "You're such an idiot, this is absolute trash. Get lost, loser!", "expected": "toxic"},
+  {"text": "脑残才会做这种视频，废物一个！", "expected": "toxic"},
+  {"text": "What a pathetic worthless piece of garbage. You're disgusting.", "expected": "toxic"},
+  {"text": "智障吧你，这种垃圾内容也好意思发出来？", "expected": "toxic"}
+]
