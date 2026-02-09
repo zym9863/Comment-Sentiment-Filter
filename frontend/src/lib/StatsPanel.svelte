@@ -8,86 +8,185 @@
   const categories: Category[] = ['constructive', 'positive', 'neutral', 'negative', 'toxic']
 </script>
 
-<div class="stats-panel">
-  <h3>分析统计</h3>
+<div class="panel">
+  <div class="panel-header">
+    <h3 class="panel-title">分析统计</h3>
+    <span class="panel-badge">STATS</span>
+  </div>
+
   {#if total === 0}
-    <p class="no-data">暂无数据</p>
+    <div class="no-data">
+      <span class="no-data-icon">—</span>
+      <span>暂无数据</span>
+    </div>
   {:else}
-    <div class="stats-grid">
-      {#each categories as cat}
+    <div class="stats-list">
+      {#each categories as cat, i}
         {@const cfg = CATEGORY_CONFIG[cat]}
         {@const count = counts[cat] ?? 0}
         {@const pct = total > 0 ? (count / total) * 100 : 0}
-        <div class="stat-row">
-          <span class="stat-label" style="color: {cfg.color}">{cfg.icon} {cfg.label}</span>
-          <div class="stat-bar-wrapper">
-            <div class="stat-bar" style="width: {pct}%; background: {cfg.color}"></div>
+        <div class="stat-item" style="animation-delay: {i * 80}ms">
+          <div class="stat-header">
+            <span class="stat-icon" style="color: {cfg.color}">{cfg.icon}</span>
+            <span class="stat-name">{cfg.label}</span>
+            <span class="stat-value">{count}</span>
           </div>
-          <span class="stat-value">{count} ({pct.toFixed(0)}%)</span>
+          <div class="stat-track">
+            <div
+              class="stat-fill"
+              style="width: {pct}%; background: {cfg.color}; animation-delay: {i * 80 + 200}ms"
+            ></div>
+          </div>
+          <span class="stat-pct">{pct.toFixed(0)}%</span>
         </div>
       {/each}
     </div>
-    <div class="total">共 {total} 条评论</div>
+
+    <div class="panel-footer">
+      <span class="total-label">共计</span>
+      <span class="total-value">{total}</span>
+      <span class="total-unit">条评论</span>
+    </div>
   {/if}
 </div>
 
 <style>
-  .stats-panel {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1rem;
+  .panel {
     background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 1.5rem;
   }
-  h3 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1rem;
-    color: var(--text-color);
-  }
-  .no-data {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    text-align: center;
-    padding: 1rem 0;
-  }
-  .stats-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .stat-row {
+
+  .panel-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
   }
-  .stat-label {
+
+  .panel-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .panel-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-tertiary);
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 2px;
+  }
+
+  .no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1rem;
+    color: var(--text-tertiary);
+    font-size: 0.82rem;
+  }
+
+  .no-data-icon {
+    font-size: 1.5rem;
+    opacity: 0.3;
+  }
+
+  .stats-list {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .stat-item {
+    animation: fadeInUp 0.5s var(--ease-out-expo) both;
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-icon {
+    font-size: 0.7rem;
+    width: 1rem;
+    text-align: center;
+  }
+
+  .stat-name {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
     font-size: 0.82rem;
     font-weight: 500;
-    min-width: 6rem;
-    white-space: nowrap;
+    color: var(--text-primary);
+    min-width: 1.5rem;
+    text-align: right;
   }
-  .stat-bar-wrapper {
-    flex: 1;
-    height: 8px;
-    background: var(--border-color);
-    border-radius: 4px;
+
+  .stat-track {
+    height: 3px;
+    background: var(--border-subtle);
+    border-radius: 2px;
     overflow: hidden;
+    margin-bottom: 0.15rem;
   }
-  .stat-bar {
+
+  .stat-fill {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s ease;
+    border-radius: 2px;
+    transform-origin: left;
+    animation: barGrow 0.8s var(--ease-out-expo) both;
+    opacity: 0.85;
   }
-  .stat-value {
+
+  .stat-pct {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+  }
+
+  .panel-footer {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .total-label {
     font-size: 0.78rem;
-    color: var(--text-muted);
-    min-width: 4.5rem;
-    text-align: right;
-    white-space: nowrap;
+    color: var(--text-tertiary);
   }
-  .total {
-    margin-top: 0.75rem;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-align: right;
+
+  .total-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .total-unit {
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
   }
 </style>

@@ -14,10 +14,13 @@ export interface SampleComment {
   expected: Category
 }
 
-export const CATEGORY_CONFIG: Record<Category, { label: string; color: string; icon: string }> = {
-  toxic: { label: '恶意攻击', color: '#ef4444', icon: '🚫' },
-  negative: { label: '负面评论', color: '#f97316', icon: '👎' },
-  neutral: { label: '中性评论', color: '#6b7280', icon: '💬' },
-  positive: { label: '正面评论', color: '#3b82f6', icon: '👍' },
-  constructive: { label: '建设性反馈', color: '#22c55e', icon: '⭐' },
+export const CATEGORY_CONFIG: Record<
+  Category,
+  { label: string; color: string; glow: string; icon: string }
+> = {
+  toxic: { label: '恶意攻击', color: 'var(--color-toxic)', glow: 'var(--color-toxic-glow)', icon: '⛔' },
+  negative: { label: '负面评论', color: 'var(--color-negative)', glow: 'var(--color-negative-glow)', icon: '▼' },
+  neutral: { label: '中性评论', color: 'var(--color-neutral)', glow: 'var(--color-neutral-glow)', icon: '◆' },
+  positive: { label: '正面评论', color: 'var(--color-positive)', glow: 'var(--color-positive-glow)', icon: '▲' },
+  constructive: { label: '建设性反馈', color: 'var(--color-constructive)', glow: 'var(--color-constructive-glow)', icon: '★' },
 }

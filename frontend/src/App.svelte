@@ -67,27 +67,43 @@
   }
 </script>
 
-<div class="app">
-  <header>
-    <h1>评论区情感过滤器</h1>
-    <p class="subtitle">基于 BERT 的恶意评论检测与建设性反馈高亮 · 支持中英文</p>
+<div class="app-shell">
+  <!-- Decorative corner accent -->
+  <div class="corner-accent top-left"></div>
+  <div class="corner-accent top-right"></div>
+
+  <header class="hero">
+    <div class="hero-badge">BERT-Powered Sentiment Analysis</div>
+    <h1 class="hero-title">
+      <span class="title-main">评论区情感过滤器</span>
+    </h1>
+    <p class="hero-subtitle">
+      <span class="subtitle-divider"></span>
+      恶意评论检测 · 建设性反馈高亮 · 中英文双语支持
+      <span class="subtitle-divider"></span>
+    </p>
   </header>
 
-  <main>
+  <main class="main-content">
     <section class="input-section">
       <CommentInput onAnalyze={analyzeComment} />
-      <div class="sample-actions">
-        <button class="sample-btn" onclick={loadSamples} disabled={loadingSamples}>
+      <div class="action-row">
+        <button class="btn-samples" onclick={loadSamples} disabled={loadingSamples}>
+          <span class="btn-icon">◈</span>
           {loadingSamples ? '加载中...' : '加载样本评论'}
         </button>
         {#if allResults.length > 0}
-          <button class="clear-btn" onclick={clearResults}>清空结果</button>
+          <button class="btn-clear" onclick={clearResults}>
+            <span class="btn-icon">✕</span>
+            清空结果
+          </button>
+          <span class="result-count">{allResults.length} 条已分析</span>
         {/if}
       </div>
     </section>
 
     <div class="content-grid">
-      <section class="results-section">
+      <section class="results-column">
         <FilterBar
           {activeFilter}
           {counts}
@@ -98,89 +114,222 @@
         <CommentList results={filteredResults} />
       </section>
 
-      <aside class="sidebar">
+      <aside class="stats-column">
         <StatsPanel {counts} />
       </aside>
     </div>
   </main>
+
+  <footer class="app-footer">
+    <span class="footer-text">Comment Sentiment Filter v0.1.0</span>
+  </footer>
 </div>
 
 <style>
-  .app {
-    max-width: 1100px;
+  .app-shell {
+    max-width: 1180px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 2.5rem 2rem 3rem;
+    min-height: 100vh;
+    position: relative;
+    animation: fadeIn 0.6s ease-out;
   }
-  header {
+
+  /* Corner accents */
+  .corner-accent {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .corner-accent.top-left {
+    top: 0;
+    left: 0;
+    border-top: 1px solid var(--border-subtle);
+    border-left: 1px solid var(--border-subtle);
+  }
+  .corner-accent.top-right {
+    top: 0;
+    right: 0;
+    border-top: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-subtle);
+  }
+
+  /* Hero header */
+  .hero {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
+    padding: 1rem 0 2rem;
+    animation: fadeInUp 0.8s var(--ease-out-expo);
   }
-  h1 {
-    font-size: 1.8rem;
-    margin: 0;
-    color: var(--text-color);
-  }
-  .subtitle {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin: 0.4rem 0 0;
-  }
-  .input-section {
+
+  .hero-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-solid);
+    border: 1px solid var(--border-subtle);
+    border-radius: 2px;
     margin-bottom: 1.5rem;
+    background: var(--glass-bg);
   }
-  .sample-actions {
+
+  .hero-title {
+    margin: 0;
+  }
+
+  .title-main {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: var(--accent-gradient);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientFlow 6s ease infinite;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 300;
+    margin-top: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .subtitle-divider {
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--border-medium);
+  }
+
+  /* Input section */
+  .input-section {
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.8s var(--ease-out-expo) 0.1s both;
+  }
+
+  .action-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .btn-samples,
+  .btn-clear {
+    display: inline-flex;
+    align-items: center;
     gap: 0.5rem;
-    margin-top: 0.75rem;
-  }
-  .sample-btn {
-    padding: 0.4rem 1rem;
-    background: var(--card-bg);
-    border: 1px solid var(--accent-color);
-    color: var(--accent-color);
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s var(--ease-out-expo);
+    letter-spacing: 0.02em;
   }
-  .sample-btn:hover:not(:disabled) {
-    background: var(--accent-color);
-    color: white;
+
+  .btn-samples {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-medium);
+    color: var(--text-primary);
+    backdrop-filter: blur(8px);
   }
-  .sample-btn:disabled {
-    opacity: 0.5;
+
+  .btn-samples:hover:not(:disabled) {
+    border-color: var(--accent-solid);
+    color: var(--accent-solid);
+    box-shadow: 0 0 20px rgba(129, 140, 248, 0.1);
+  }
+
+  .btn-samples:disabled {
+    opacity: 0.4;
     cursor: not-allowed;
   }
-  .clear-btn {
-    padding: 0.4rem 1rem;
+
+  .btn-clear {
     background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
-    border-radius: 6px;
-    font-size: 0.85rem;
-    cursor: pointer;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
   }
-  .clear-btn:hover {
-    border-color: #ef4444;
-    color: #ef4444;
+
+  .btn-clear:hover {
+    border-color: var(--color-toxic);
+    color: var(--color-toxic);
   }
+
+  .btn-icon {
+    font-size: 0.75rem;
+  }
+
+  .result-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-left: auto;
+    letter-spacing: 0.05em;
+  }
+
+  /* Content grid */
   .content-grid {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 1.5rem;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
     align-items: start;
+    animation: fadeInUp 0.8s var(--ease-out-expo) 0.2s both;
   }
-  .results-section {
+
+  .results-column {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
   }
-  @media (max-width: 768px) {
+
+  /* Footer */
+  .app-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-subtle);
+    text-align: center;
+  }
+
+  .footer-text {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 820px) {
+    .app-shell {
+      padding: 1.5rem 1rem 2rem;
+    }
+    .title-main {
+      font-size: 2rem;
+    }
     .content-grid {
       grid-template-columns: 1fr;
     }
-    .sidebar {
+    .stats-column {
       order: -1;
+    }
+    .corner-accent {
+      display: none;
     }
   }
 </style>

@@ -6,33 +6,59 @@
 </script>
 
 {#if results.length === 0}
-  <div class="empty-state">
-    <p>暂无评论分析结果</p>
+  <div class="empty">
+    <div class="empty-icon">◇</div>
+    <p class="empty-title">等待分析</p>
     <p class="empty-hint">输入评论或加载样本数据开始体验</p>
   </div>
 {:else}
-  <div class="comment-list">
+  <div class="list">
     {#each results as result, i (i)}
-      <CommentCard {result} />
+      <div class="list-item" style="animation-delay: {Math.min(i * 60, 600)}ms">
+        <CommentCard {result} />
+      </div>
     {/each}
   </div>
 {/if}
 
 <style>
-  .comment-list {
+  .list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
-  .empty-state {
+
+  .list-item {
+    animation: fadeInUp 0.5s var(--ease-out-expo) both;
+  }
+
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
     text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-muted);
+    animation: fadeIn 0.6s ease;
   }
-  .empty-state p {
-    margin: 0.25rem 0;
+
+  .empty-icon {
+    font-size: 2rem;
+    color: var(--text-tertiary);
+    margin-bottom: 1rem;
+    animation: pulseGlow 3s ease infinite;
   }
+
+  .empty-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+  }
+
   .empty-hint {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    color: var(--text-tertiary);
+    font-weight: 300;
   }
 </style>

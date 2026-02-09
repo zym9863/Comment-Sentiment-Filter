@@ -10,128 +10,247 @@
   let isConstructive = $derived(result.category === 'constructive')
 </script>
 
-<div
-  class="comment-card"
+<article
+  class="card"
   class:toxic={isToxic}
   class:constructive={isConstructive}
-  style="--category-color: {config.color}"
+  style="--cat-color: {config.color}; --cat-glow: {config.glow}"
 >
+  <!-- Accent line -->
+  <div class="card-accent"></div>
+
   {#if isToxic && !expanded}
-    <div class="toxic-overlay">
-      <span class="toxic-label">{config.icon} 此评论已被隐藏（检测到恶意内容）</span>
-      <button class="reveal-btn" onclick={() => (expanded = true)}>点击查看</button>
+    <div class="toxic-mask">
+      <div class="toxic-icon">⛔</div>
+      <div class="toxic-info">
+        <span class="toxic-label">此评论已被屏蔽</span>
+        <span class="toxic-reason">检测到恶意内容 · 置信度 {(result.confidence * 100).toFixed(0)}%</span>
+      </div>
+      <button class="reveal-btn" onclick={() => (expanded = true)}>
+        查看内容
+      </button>
     </div>
   {:else}
-    <div class="card-header">
-      <span class="category-badge" style="background: {config.color}">
-        {config.icon} {config.label}
-      </span>
-      <span class="confidence">置信度 {(result.confidence * 100).toFixed(1)}%</span>
-      {#if isToxic}
-        <button class="hide-btn" onclick={() => (expanded = false)}>隐藏</button>
-      {/if}
-    </div>
-    <p class="comment-text">{result.text}</p>
-    <div class="card-footer">
-      <div class="confidence-bar">
-        <div class="confidence-fill" style="width: {result.confidence * 100}%; background: {config.color}"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="category-tag">
+          <span class="tag-icon">{config.icon}</span>
+          {config.label}
+        </span>
+        <div class="meta-right">
+          {#if isToxic}
+            <button class="hide-btn" onclick={() => (expanded = false)}>隐藏</button>
+          {/if}
+          <span class="confidence-label">
+            {(result.confidence * 100).toFixed(1)}%
+          </span>
+        </div>
       </div>
-      <span class="sentiment-stars">
-        {'★'.repeat(result.sentiment_score)}{'☆'.repeat(5 - result.sentiment_score)}
-      </span>
+
+      <p class="card-text">{result.text}</p>
+
+      <div class="card-data">
+        <div class="confidence-track">
+          <div
+            class="confidence-fill"
+            style="width: {result.confidence * 100}%"
+          ></div>
+        </div>
+        <div class="sentiment-meter">
+          {#each Array(5) as _, i}
+            <span class="meter-dot" class:active={i < result.sentiment_score}></span>
+          {/each}
+        </div>
+      </div>
     </div>
   {/if}
-</div>
+</article>
 
 <style>
-  .comment-card {
-    border: 1px solid var(--border-color);
-    border-left: 4px solid var(--category-color);
-    border-radius: 8px;
-    padding: 1rem;
+  .card {
+    position: relative;
     background: var(--card-bg);
-    transition: box-shadow 0.2s;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.35s var(--ease-out-expo);
+    backdrop-filter: blur(8px);
   }
-  .comment-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .card:hover {
+    background: var(--card-bg-hover);
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
-  .comment-card.constructive {
-    background: color-mix(in srgb, var(--category-color) 5%, var(--card-bg));
+
+  .card.constructive {
+    box-shadow: inset 0 0 30px var(--cat-glow);
   }
-  .comment-card.toxic {
-    border-left-width: 4px;
+
+  .card.constructive:hover {
+    box-shadow: inset 0 0 30px var(--cat-glow), var(--shadow-md);
   }
-  .toxic-overlay {
+
+  /* Left accent stripe */
+  .card-accent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--cat-color);
+    opacity: 0.8;
+    transition: opacity 0.3s, width 0.3s;
+  }
+
+  .card:hover .card-accent {
+    opacity: 1;
+    width: 4px;
+  }
+
+  /* Toxic overlay */
+  .toxic-mask {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1rem 1rem 1.5rem;
+  }
+
+  .toxic-icon {
+    font-size: 1.2rem;
+    opacity: 0.6;
+  }
+
+  .toxic-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .toxic-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .toxic-reason {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.03em;
+  }
+
+  .reveal-btn,
+  .hide-btn {
+    padding: 0.3rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: 3px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .reveal-btn:hover,
+  .hide-btn:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+  }
+
+  /* Card body */
+  .card-body {
+    padding: 1rem 1.25rem 1rem 1.5rem;
+  }
+
+  .card-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.25rem 0;
-    color: var(--text-muted);
-  }
-  .toxic-label {
-    font-size: 0.85rem;
-  }
-  .reveal-btn,
-  .hide-btn {
-    padding: 0.2rem 0.6rem;
-    font-size: 0.75rem;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    color: var(--text-muted);
-    cursor: pointer;
-  }
-  .reveal-btn:hover,
-  .hide-btn:hover {
-    background: var(--border-color);
-  }
-  .card-header {
-    display: flex;
-    align-items: center;
     gap: 0.75rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
   }
-  .category-badge {
+
+  .category-tag {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.15rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: white;
+    gap: 0.35rem;
+    padding: 0.2rem 0.75rem;
+    background: var(--cat-glow);
+    border-radius: 3px;
+    font-size: 0.78rem;
     font-weight: 500;
+    color: var(--cat-color);
+    letter-spacing: 0.02em;
   }
-  .confidence {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-left: auto;
+
+  .tag-icon {
+    font-size: 0.7rem;
   }
-  .comment-text {
-    margin: 0.5rem 0;
-    line-height: 1.6;
-    color: var(--text-color);
-  }
-  .card-footer {
+
+  .meta-right {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-top: 0.5rem;
   }
-  .confidence-bar {
+
+  .confidence-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.04em;
+  }
+
+  .card-text {
+    font-size: 0.92rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  .card-data {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .confidence-track {
     flex: 1;
-    height: 4px;
-    background: var(--border-color);
-    border-radius: 2px;
+    height: 2px;
+    background: var(--border-subtle);
+    border-radius: 1px;
     overflow: hidden;
   }
+
   .confidence-fill {
     height: 100%;
-    border-radius: 2px;
-    transition: width 0.3s ease;
+    background: var(--cat-color);
+    border-radius: 1px;
+    transition: width 0.5s var(--ease-out-expo);
+    opacity: 0.7;
   }
-  .sentiment-stars {
-    font-size: 0.85rem;
-    color: #eab308;
-    white-space: nowrap;
+
+  .sentiment-meter {
+    display: flex;
+    gap: 4px;
+  }
+
+  .meter-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-subtle);
+    transition: all 0.3s;
+  }
+
+  .meter-dot.active {
+    background: var(--cat-color);
+    box-shadow: 0 0 6px var(--cat-glow);
   }
 </style>
