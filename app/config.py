@@ -2,7 +2,8 @@ import torch
 
 MODEL_NAME = "nlptown/bert-base-multilingual-uncased-sentiment"
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# transformers pipeline expects an int: 0 for first CUDA device, -1 for CPU
+DEVICE = 0 if torch.cuda.is_available() else -1
 
 # 毒性检测阈值：情感评分 <= 此值且命中关键词 → toxic
 TOXIC_SENTIMENT_THRESHOLD = 1  # 1星

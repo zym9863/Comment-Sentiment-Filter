@@ -22,9 +22,10 @@ _STAR_MAP = {"1 star": 1, "2 stars": 2, "3 stars": 3, "4 stars": 4, "5 stars": 5
 
 class CommentClassifier:
     def __init__(self) -> None:
-        self.pipe = self._init_pipeline()
+        self._device = DEVICE
+        self.pipe = self._init_pipeline(self._device)
 
-    def _init_pipeline(self):
+    def _init_pipeline(self, device: int):
         if hf_pipeline is None:
             return self._rule_based_pipeline()
 
@@ -32,14 +33,32 @@ class CommentClassifier:
             return hf_pipeline(
                 "sentiment-analysis",
                 model=MODEL_NAME,
-                device=DEVICE,
+                device=device,
                 truncation=True,
                 max_length=512,
             )
         except Exception:
+            # If CUDA fails during init, try CPU before falling back.
+            if device != -1:
+                try:
+                    pipe = hf_pipeline(
+                        "sentiment-analysis",
+                        model=MODEL_NAME,
+                        device=-1,
+                        truncation=True,
+                        max_length=512,
+                    )
+                    self._device = -1
+                    return pipe
+                except Exception:
+                    pass
             # If transformers is installed but not usable (e.g. bad deps),
             # fall back to a lightweight rule-based scorer for tests/dev.
             return self._rule_based_pipeline()
+
+    def _is_cuda_error(self, exc: RuntimeError) -> bool:
+        msg = str(exc)
+        return "CUBLAS_STATUS_NOT_INITIALIZED" in msg or "CUDA error" in msg
 
     def _rule_based_pipeline(self):
         def _score(text: str):
@@ -114,7 +133,16 @@ class CommentClassifier:
                 is_constructive=False,
             )
 
-        result = self.pipe(text)[0]
+        try:
+            result = self.pipe(text)[0]
+        except RuntimeError as exc:
+            # If CUDA fails at runtime, re-init on CPU once and retry.
+            if self._device != -1 and self._is_cuda_error(exc):
+                self._device = -1
+                self.pipe = self._init_pipeline(self._device)
+                result = self.pipe(text)[0]
+            else:
+                raise
         star = _STAR_MAP.get(result["label"], 3)
         confidence = result["score"]
 
