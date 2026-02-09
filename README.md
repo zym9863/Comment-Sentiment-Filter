@@ -1,3 +1,5 @@
+[English](README-EN.md) | 中文
+
 # Comment Sentiment Filter（评论区情感过滤器）
 
 基于 BERT 的中英文评论情感分析与内容过滤服务，支持识别恶意评论、建设性反馈与常规情感分类，并提供简洁的前端可视化界面。
